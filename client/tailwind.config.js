@@ -9,7 +9,8 @@ export default {
       colors: {
         "blue-300": "#f0f5ff",
         "primary": "#faa6ff",
-        "mauve-500": "#faa6ff"
+        "mauve-500": "#faa6ff",
+        "secondary":"#1d3461"
         
       },
       boxShadow: {
