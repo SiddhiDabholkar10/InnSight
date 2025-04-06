@@ -74,7 +74,10 @@ app.get('/test', (req,res) => {
       res.json(null);
     }
   });
-  
+ 
+ app.post('/logout', (req,res) => {
+    res.cookie('token', '').json(true); // Clear the cookie by setting it to an empty string
+ });
 
 
 app.listen(4000, () => { 
