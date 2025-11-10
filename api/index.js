@@ -5,8 +5,16 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('./models/User.js');
 const cookieParser = require('cookie-parser');
+const imageDownloader = require('image-downloader');
 require('dotenv').config();
 const app = express();
+const path = require("path");
+const fs = require("fs");
+const uploadsDir = path.join(__dirname, "uploads");
+
+fs.mkdirSync(uploadsDir, { recursive: true });
+app.use("/uploads", express.static(uploadsDir));
+
 
 const bcryptSalt = bcrypt.genSaltSync(10);
 
@@ -92,6 +100,34 @@ app.get('/test', (req,res) => {
     res.cookie('token', '').json(true); // Clear the cookie by setting it to an empty string
  });
 
+
+// --- Upload by Photos With Link ---
+app.post('/upload-by-link', async (req, res) => {
+  try {
+     // Extract the 'link' property from the request body
+    const link = req.body.link;           
+     // Basic validation: ensure 'link' exists and is a string      
+    if (!link || typeof link !== 'string') {
+      return res.status(400).json({ error: "Valid 'link' string is required" });
+    }
+
+    // Create a unique file name using the current timestamp
+    const newName = Date.now() + '.jpg';
+    const dest = path.join(__dirname, 'uploads', newName);
+
+    // Download and save the image from the provided link into the 'uploads' folder
+    // image-downloader automatically fetches the file from the URL
+    await imageDownloader.image({ url: link.trim(), dest }); // image-downloader needs a string
+    // Respond to the client with the file path
+    res.json({dest});
+    console.log('Image downloaded and saved to', dest);
+  } catch (err) {
+    // If an error occurs (e.g., invalid URL, download failure),
+    // catch it here and send a 500 response to the client
+    console.error('upload-by-link error:', err);
+    res.status(500).json({ error: 'download failed', details: String(err.message || err) });
+  }
+});
 
 app.listen(4000, () => { 
     console.log("Server is running on port 4000");
