@@ -9,20 +9,28 @@ require('dotenv').config();
 const app = express();
 
 const bcryptSalt = bcrypt.genSaltSync(10);
-const jwtSecret = 'fasefraw4r5r3wq45wdfgw34twdfg';
 
+const jwtSecret = process.env.jwtSECRET;
+
+//parses jsion body and put it in req.body
 app.use(express.json());
+
+//parses cookie and put it in req.cookies
 app.use(cookieParser());
+// Allow the frontend (Vite default: http://localhost:5173) to call this API and send cookies
 app.use(cors({
   credentials: true,
   origin: 'http://localhost:5173',
 }));
-  
+
+// --- Database connection ---
 mongoose.connect(process.env.MONGO_URL);
+// --- Health check route (quick test) ---
 app.get('/test', (req,res) => {
     res.json('test ok');
   });
-  
+  // --- Register a new user ---
+
   app.post('/register', async (req,res) => {
     const {name,email,password} = req.body;
   
@@ -30,15 +38,18 @@ app.get('/test', (req,res) => {
       const userDoc = await User.create({
         name,
         email,
-        password:bcrypt.hashSync(password, bcryptSalt),
+        password:bcrypt.hashSync(password, bcryptSalt),       // Hash the password before storing
       });
-      res.json(userDoc);
+      res.json(userDoc);   // Return the created user document
     } catch (e) {
       res.status(422).json(e);
     }
   
   });
   
+// --- Login ---
+// Expects JSON body: { email, password }
+// If OK: creates a JWT and sends it back as an HTTP cookie named "token"
   app.post('/login', async (req,res) => {
     const {email,password} = req.body;
     const userDoc = await User.findOne({email});
@@ -61,6 +72,8 @@ app.get('/test', (req,res) => {
     }
   });
   
+// --- Get current profile ---
+// Reads JWT from cookie, verifies it, then returns basic user info
   app.get('/profile', (req,res) => {
     const {token} = req.cookies;
     if (token) {
@@ -74,7 +87,7 @@ app.get('/test', (req,res) => {
       res.json(null);
     }
   });
- 
+// --- Logout ---
  app.post('/logout', (req,res) => {
     res.cookie('token', '').json(true); // Clear the cookie by setting it to an empty string
  });

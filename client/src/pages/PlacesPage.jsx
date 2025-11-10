@@ -1,6 +1,20 @@
 import { Link, useParams } from "react-router-dom";
+import { useState } from "react"; 
+
+
+
 export default function PlacesPage() {
   const { action } = useParams();
+  const [title, setTitle] = useState("");
+  const [address, setAddress] = useState("");
+  const [addedPhotos, setAddedPhotos] = useState([]);
+  const [photoLink, setPhotoLink] = useState("");
+  const [description, setDescription] = useState("");
+  const [perks, setPerks] = useState([]);
+  const [extraInfo, setExtraInfo] = useState("");
+  const [checkIn, setCheckIn] = useState("");
+  const [checkOut, setCheckOut] = useState("");
+  const [maxGuests, setMaxGuests] = useState(1);
 
   return (
     <div>
@@ -51,13 +65,13 @@ export default function PlacesPage() {
             <input type="text" placeholder="How to get there?" />
             <h2 className="text-xl mt-4">Photos</h2>
             <div className="grid grid-rows-2 lg:grid-rows-2 md:grid-rows-2 sm:grid-rows-2 gap-4 mt-2">
-            <div className="flex gap-2">
-              <input type="text" placeholder="{'Add using a link ... jpg'}" />
-              <button className="bg-gray-200 px-4 rounded-2xl">
-                Add&nbsp;Photo Link
-              </button>
-            </div>
-            
+              <div className="flex gap-2">
+                <input type="text" placeholder="{'Add using a link ... jpg'}" />
+                <button className="bg-gray-200 px-4 rounded-2xl">
+                  Add&nbsp;Photo Link
+                </button>
+              </div>
+
               <button className="flex justify-center border bg-transparent rounded-2xl p-8 text-xl text-gray-400 text-gray-400">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -75,9 +89,9 @@ export default function PlacesPage() {
               </button>
             </div>
             <h2 className="text-xl mt-4">Perks</h2>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-2">
-              <label className="flex items-center gap-2">
-                <input type="checkbox"/>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-3">
+              <label className="border p-4 flex rounded-2xl items-center gap-2">
+                <input type="checkbox" />
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 20 20"
@@ -93,7 +107,7 @@ export default function PlacesPage() {
 
                 <span>Wifi</span>
               </label>
-              <label className="flex items-center gap-2">
+              <label className="border p-4 flex rounded-2xl items-center gap-2">
                 <input type="checkbox" />
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -108,7 +122,7 @@ export default function PlacesPage() {
 
                 <span>Free Parking Spot</span>
               </label>
-              <label className="flex items-center gap-2">
+              <label className="border p-4 flex rounded-2xl items-center gap-2">
                 <input type="checkbox" />
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -127,7 +141,7 @@ export default function PlacesPage() {
 
                 <span>Television</span>
               </label>
-              <label className="flex items-center gap-2" >
+              <label className="border p-4 flex rounded-2xl items-center gap-2">
                 <input type="checkbox" />
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -146,7 +160,7 @@ export default function PlacesPage() {
 
                 <span>Pets Allowed</span>
               </label>
-              <label className="flex items-center gap-2">
+              <label className="border p-4 flex rounded-2xl items-center gap-2">
                 <input type="checkbox" />
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -162,7 +176,7 @@ export default function PlacesPage() {
 
                 <span>Private Entrance</span>
               </label>
-              <label className="flex items-center gap-2">
+              <label className="border p-4 flex rounded-2xl items-center gap-2">
                 <input type="checkbox" />
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -178,6 +192,31 @@ export default function PlacesPage() {
                 <span>Air Conditioning</span>
               </label>
             </div>
+            <h2 className="text-xl mt-4">Extra Info</h2>
+            <p className="text-gray-500 text-sm">House rules, etc</p>
+            <textarea />
+            <h2 className="text-xl mt-4">Check in & out times</h2>
+            <div className="grid sm:grid-cols-3 gap-2">
+              <div>
+                <h3 className="mt-2 -mb-1">Check in time</h3>
+                <input type="text" placeholder="14:00" />
+              </div>
+              <div>
+                <h3 className="mt-2 -mb-1">Check out time</h3>
+                <input type="text" placeholder="16:00" />
+              </div>
+              <div>
+                <h3 className="mt-2 -mb-1">Guest Count</h3>
+                <input type="text" placeholder="16:00" />
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              className="primary my-4 w-full block !w-full !block text-center"
+            >
+              Save
+            </button>
           </form>
         </div>
       )}

@@ -8,8 +8,8 @@ export default {
     extend: {
       colors: {
         "blue-300": "#f0f5ff",
-        "primary": "#faa6ff",
-        "mauve-500": "#faa6ff",
+        "primary": "#baacf9ff",
+        "mauve-500": "#664ae3ff",
         "secondary":"#1d3461"
         
       },
