@@ -3,6 +3,7 @@ import { useState } from "react";
 import Perks from "./Perks";
 import axios from "axios";
 
+
 export default function PlacesPage() {
   const { action } = useParams();
   const [title, setTitle] = useState("");
@@ -32,13 +33,26 @@ export default function PlacesPage() {
       </>
     );
   }
-  //Adding Photo by Link 
+  //Adding Photo by Link
   async function addPhotoWithLink(ev) {
     ev.preventDefault();
-    await axios.post('/upload-by-link' , { link: photoLink });
-    
+    const { data: filename } = await axios.post("/upload-by-link", {
+      link: photoLink,
+    });
+    console.log("Uploaded filename:", filename);
+    setAddedPhotos((prev) => {
+      return [...prev, filename];
+    });
+
+    //set to empty again after adding
+    setPhotoLink('');
   }
 
+
+  function uploadPhoto(ev){
+    const files = ev.target.files;
+    console.log(files);
+  }
   return (
     <div>
       {action !== "new" && (
@@ -59,9 +73,9 @@ export default function PlacesPage() {
               className="size-6"
             >
               <path
-                fill-rule="evenodd"
+                fillRule="evenodd"
                 d="M12 3.75a.75.75 0 0 1 .75.75v6.75h6.75a.75.75 0 0 1 0 1.5h-6.75v6.75a.75.75 0 0 1-1.5 0v-6.75H4.5a.75.75 0 0 1 0-1.5h6.75V4.5a.75.75 0 0 1 .75-.75Z"
-                clip-rule="evenodd"
+                clipRule="evenodd"
               />
             </svg>{" "}
             Add a new place
@@ -104,34 +118,49 @@ export default function PlacesPage() {
               onChange={(ev) => setAddress(ev.target.value)}
             />
             <h2 className="text-xl mt-4">Photos</h2>
-            <div className="grid grid-rows-2 lg:grid-rows-2 md:grid-rows-2 sm:grid-rows-2 gap-4 mt-2">
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  placeholder="{'Add using a link ... jpg'}"
-                  value={photoLink}
-                  onChange={(ev) => setPhotoLink(ev.target.value)}
-                />
-                <button className="bg-gray-200 px-4 rounded-2xl" onClick={addPhotoWithLink}>
-                  Add&nbsp;Photo Link
-                </button>
-              </div>
 
-              <button className="flex justify-center border bg-transparent rounded-2xl p-8 text-xl text-gray-400 text-gray-400">
+            <div className="flex gap-2">
+              <input
+                type="text"
+                placeholder="{'Add using a link ... jpg'}"
+                value={photoLink}
+                onChange={(ev) => setPhotoLink(ev.target.value)}
+              />
+              <button
+                className="bg-gray-200 px-4 rounded-2xl"
+                onClick={addPhotoWithLink}
+              >
+                Add&nbsp;Photo Link
+              </button>
+            </div>
+            
+            <div className="mt-2 grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
+              {addedPhotos.length > 0 &&
+                addedPhotos.map((link) => (
+                  <div key={link}>
+                    <img
+                      className="rounded-2xl"
+                      src={`http://localhost:4000/uploads/${link}`}
+                      alt=""  
+                    />
+                  </div>
+                ))}
+              <label className="flex justify-center border bg-transparent rounded-2xl p-2 text-xl text-gray-400 text-gray-400">
+                <input type="file" className="hidden" onChange={uploadPhoto}/>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 20 20"
                   fill="currentColor"
-                  class="size-8"
+                  className="size-8"
                 >
                   <path
-                    fill-rule="evenodd"
+                    fillRule="evenodd"
                     d="M5.5 17a4.5 4.5 0 0 1-1.44-8.765 4.5 4.5 0 0 1 8.302-3.046 3.5 3.5 0 0 1 4.504 4.272A4 4 0 0 1 15 17H5.5Zm3.75-2.75a.75.75 0 0 0 1.5 0V9.66l1.95 2.1a.75.75 0 1 0 1.1-1.02l-3.25-3.5a.75.75 0 0 0-1.1 0l-3.25 3.5a.75.75 0 1 0 1.1 1.02l1.95-2.1v4.59Z"
-                    clip-rule="evenodd"
+                    clipRule="evenodd"
                   />
                 </svg>
                 &nbsp;&nbsp;Upload from your device
-              </button>
+              </label>
             </div>
             <h2 className="text-xl mt-4">Perks</h2>
             <Perks selected={perks} onChange={setPerks} />

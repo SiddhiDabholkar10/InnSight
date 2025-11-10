@@ -112,14 +112,15 @@ app.post('/upload-by-link', async (req, res) => {
     }
 
     // Create a unique file name using the current timestamp
-    const newName = Date.now() + '.jpg';
+    const newName = 'photo-' + Date.now() + '.jpg';
     const dest = path.join(__dirname, 'uploads', newName);
 
     // Download and save the image from the provided link into the 'uploads' folder
     // image-downloader automatically fetches the file from the URL
     await imageDownloader.image({ url: link.trim(), dest }); // image-downloader needs a string
+    console.log({newName,dest});
     // Respond to the client with the file path
-    res.json({dest});
+    res.json(newName);
     console.log('Image downloaded and saved to', dest);
   } catch (err) {
     // If an error occurs (e.g., invalid URL, download failure),
