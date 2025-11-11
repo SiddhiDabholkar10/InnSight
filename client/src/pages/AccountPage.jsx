@@ -21,7 +21,7 @@ export default function AccountPage() {
     // If no subpage is provided in the URL, default to 'profile'
     subpage = "profile";
   }
-  console.log("Subpage:", subpage); // For debugging purposes, to see which subpage is being accessed
+  //console.log("Subpage:", subpage); // For debugging purposes, to see which subpage is being accessed
 
   //this function will basically help to highlight the link that you're currently on
   function linkClasses(type = null) {

@@ -10,7 +10,9 @@ require('dotenv').config();
 const app = express();
 const path = require("path");
 const fs = require("fs");
+const multer = require("multer");
 const uploadsDir = path.join(__dirname, "uploads");
+
 
 fs.mkdirSync(uploadsDir, { recursive: true });
 app.use("/uploads", express.static(uploadsDir));
@@ -129,6 +131,29 @@ app.post('/upload-by-link', async (req, res) => {
     res.status(500).json({ error: 'download failed', details: String(err.message || err) });
   }
 });
+
+
+// --- Upload Photos from device ---
+const photosMiddleware = multer({ dest: 'uploads/' });
+
+app.post('/upload', photosMiddleware.array('photos',100),(req, res) => {
+  const uploadedFiles = []; 
+  for (let i = 0; i < req.files.length; i++) {
+      const {path,originalname} = req.files[i];
+      const parts = originalname.split('.');
+      const ext = parts[parts.length - 1];
+      const newPath = path + '.' + ext;
+      fs.renameSync(path, newPath);
+      uploadedFiles.push(newPath.replace('uploads\\','')); // Store only the filename, not the full path
+
+   }
+   res.json(uploadedFiles);
+
+
+});
+
+
+// --- Start the server ---
 
 app.listen(4000, () => { 
     console.log("Server is running on port 4000");

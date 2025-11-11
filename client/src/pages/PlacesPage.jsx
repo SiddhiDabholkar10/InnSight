@@ -50,8 +50,34 @@ export default function PlacesPage() {
 
 
   function uploadPhoto(ev){
+    //Get the file(s) selected by the user from the <input type="file" />
     const files = ev.target.files;
-    console.log(files);
+    // Create a new FormData object — used to send files or form data in HTTP requests
+    const data = new FormData();
+   for (let i = 0; i < files.length; i++) {
+         // Append the first selected file to the FormData under the key 'photos'
+    // The backend will use this key to access the uploaded file (req.file / req.files)
+   
+      data.append('photos', files[i]);
+    }
+  
+  //Send a POST request to the backend endpoint '/upload'
+  // Include the FormData and set the Content-Type header to 'multipart/form-data'
+  // (axios automatically handles boundary formatting for this type)
+    axios.post('/upload',data,{
+      headers:{'Content-Type':'multipart/form-data'}
+    }).then(response=>{
+      // Extract the filename returned by the backend from the response
+      const {data:filenames} = response;
+
+      // Add the new filename to the existing list of uploaded photos
+    // setAddedPhotos updates React state while preserving previous items
+      setAddedPhotos((prev) => {
+      return [...prev, ...filenames];
+    });
+
+    });
+
   }
   return (
     <div>
@@ -137,7 +163,7 @@ export default function PlacesPage() {
             <div className="mt-2 grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
               {addedPhotos.length > 0 &&
                 addedPhotos.map((link) => (
-                  <div key={link}>
+                  <div className="h-32 flex" key={link}>
                     <img
                       className="rounded-2xl"
                       src={`http://localhost:4000/uploads/${link}`}
@@ -145,8 +171,8 @@ export default function PlacesPage() {
                     />
                   </div>
                 ))}
-              <label className="flex justify-center border bg-transparent rounded-2xl p-2 text-xl text-gray-400 text-gray-400">
-                <input type="file" className="hidden" onChange={uploadPhoto}/>
+              <label className="h-32 flex justify-center border bg-transparent rounded-2xl p-2 text-xl text-gray-400 text-gray-400">
+                <input type="file" multiple className="hidden" onChange={uploadPhoto}/>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 20 20"
