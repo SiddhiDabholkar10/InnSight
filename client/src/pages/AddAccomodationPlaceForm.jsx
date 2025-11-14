@@ -8,7 +8,7 @@ import AccountNav from "../AccountNav.jsx";
 
 export default function AddAccomodationPlaceForm() {
   const { id } = useParams();
-  console.log(id);
+  //console.log(id);
   const [title, setTitle] = useState("");
   const [address, setAddress] = useState("");
   const [addedPhotos, setAddedPhotos] = useState([]);

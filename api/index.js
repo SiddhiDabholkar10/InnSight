@@ -17,12 +17,14 @@ const uploadsDir = path.join(__dirname, "uploads");
 
 fs.mkdirSync(uploadsDir, { recursive: true });
 app.use("/uploads", express.static(uploadsDir));
+const mime = require('mime-types');
+//const {S3Client, PutObjectCommand} = require('@aws-sdk/client-s3');
 
 const bcryptSalt = bcrypt.genSaltSync(10);
 
 const jwtSecret = process.env.jwtSECRET;
 
-//parses jsion body and put it in req.body
+//parses json body and put it in req.body
 app.use(express.json());
 
 //parses cookie and put it in req.cookies
@@ -108,36 +110,19 @@ app.post("/logout", (req, res) => {
   res.cookie("token", "").json(true); // Clear the cookie by setting it to an empty string
 });
 
-// --- Upload by Photos With Link ---
-app.post("/upload-by-link", async (req, res) => {
-  try {
-    // Extract the 'link' property from the request body
-    const link = req.body.link;
-    // Basic validation: ensure 'link' exists and is a string
-    if (!link || typeof link !== "string") {
-      return res.status(400).json({ error: "Valid 'link' string is required" });
-    }
 
-    // Create a unique file name using the current timestamp
-    const newName = "photo-" + Date.now() + ".jpg";
-    const dest = path.join(__dirname, "uploads", newName);
+// --- Upload Photo by Link ---
 
-    // Download and save the image from the provided link into the 'uploads' folder
-    // image-downloader automatically fetches the file from the URL
-    await imageDownloader.image({ url: link.trim(), dest }); // image-downloader needs a string
-    console.log({ newName, dest });
-    // Respond to the client with the file path
-    res.json(newName);
-    console.log("Image downloaded and saved to", dest);
-  } catch (err) {
-    // If an error occurs (e.g., invalid URL, download failure),
-    // catch it here and send a 500 response to the client
-    console.error("upload-by-link error:", err);
-    res
-      .status(500)
-      .json({ error: "download failed", details: String(err.message || err) });
-  }
+app.post('/upload-by-link', async (req,res) => {
+  const {link} = req.body;
+  const newName = 'photo' + Date.now() + '.jpg';
+  await imageDownloader.image({
+    url: link, 
+    dest: __dirname + '/uploads/' + newName,
+  });
+  res.json(newName);
 });
+
 
 // --- Upload Photos from device ---
 const photosMiddleware = multer({ dest: "uploads/" });
@@ -150,7 +135,7 @@ app.post("/upload", photosMiddleware.array("photos", 100), (req, res) => {
     const ext = parts[parts.length - 1];
     const newPath = path + "." + ext;
     fs.renameSync(path, newPath);
-    uploadedFiles.push(newPath.replace("uploads\\", "")); // Store only the filename, not the full path
+    uploadedFiles.push(newPath.replace("uploads\\", "/")); // Store only the filename, not the full path
   }
   res.json(uploadedFiles);
 });
