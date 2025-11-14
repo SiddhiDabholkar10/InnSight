@@ -1,4 +1,5 @@
-import {useState} from "react";
+import { useState, useEffect } from "react";
+import { Navigate, useParams } from "react-router-dom";
 
 import Perks from "./Perks";
 import axios from "axios";
@@ -6,6 +7,8 @@ import PhotosUploader from "../PhotosUploader.jsx";
 import AccountNav from "../AccountNav.jsx";
 
 export default function AddAccomodationPlaceForm() {
+  const { id } = useParams();
+  console.log(id);
   const [title, setTitle] = useState("");
   const [address, setAddress] = useState("");
   const [addedPhotos, setAddedPhotos] = useState([]);
@@ -16,6 +19,24 @@ export default function AddAccomodationPlaceForm() {
   const [checkIn, setCheckIn] = useState("");
   const [checkOut, setCheckOut] = useState("");
   const [maxGuests, setMaxGuests] = useState(1);
+  const [redirect, setRedirect] = useState(false);
+  useEffect(() => {
+    if (!id) {
+      return;
+    }
+    axios.get("/places/" + id).then((response) => {
+      const { data } = response;
+      setTitle(data.title);
+      setAddress(data.address);
+      setAddedPhotos(data.photos);
+      setDescription(data.description);
+      setPerks(data.perks);
+      setExtraInfo(data.extraInfo);
+      setCheckIn(data.checkIn);
+      setCheckOut(data.checkOut);
+      setMaxGuests(data.maxGuests);
+    });
+  }, [id]);
 
   function inputHeader(text) {
     return <h2 className="text-2xl mt-4">{text}</h2>;
@@ -35,9 +56,9 @@ export default function AddAccomodationPlaceForm() {
   }
 
   //Form Submission Handler
-  async function addNewAccomodationPlaces(ev) {
+  async function savePlace(ev) {
     ev.preventDefault();
-    await axios.post("/addAccomodations", {
+    const placeData = {
       title,
       address,
       addedPhotos,
@@ -47,14 +68,28 @@ export default function AddAccomodationPlaceForm() {
       checkIn,
       checkOut,
       maxGuests,
-    });
-    setRedirectToAccomodationsList(true);
+    };
+    if (id) {
+      //this id already exist so all we need to do is update the info on it
+      await axios.put("/places", {
+       id,
+       ...placeData
+      });
+      setRedirect(true);
+    } else {
+      await axios.post("/places", placeData);
+      setRedirect(true);
+    }
+    //post new place to db
+  }
+  if (redirect) {
+    return <Navigate to={"/account/places"} />;
   }
   return (
     <>
       <div>
         <AccountNav />
-        <form onSubmit={addNewAccomodationPlaces}>
+        <form onSubmit={savePlace}>
           {preInput(
             "Title",
             "Title for your place. should be short and catchy as in advertisement"

@@ -5,7 +5,7 @@ import axios from "axios";
 import PlacesPage from "./PlacesPage.jsx";
 import AccountNav from "../AccountNav.jsx";
 
-export default function AccountPage() {
+export default function ProfilePage() {
   const { ready, user, setUser } = useContext(UserContext);
   const [redirect, setRedirect] = useState(null); // This state can be used to redirect after logout, if needed
   let { subpage } = useParams();

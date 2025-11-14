@@ -7,7 +7,7 @@ const placeSchema = new Schema({
     title: {type: String, required: true}, // Title of the place
     address : {type: String, required: true}, // Address of the place
     photos : [{type: String}], // Array of photo URLs for the place
-    description : {type: String, required: true}, // Description of the place
+    description : {type: String}, // Description of the place
     perks : [{type: String}], // Array of perks or amenities (e.g., WiFi, kitchen, etc.)
     extraInfo : [{type: String}], // Additional information about the place (optional)
     checkIn : [{type: Number}],

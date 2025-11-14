@@ -1,4 +1,5 @@
 const express = require("express");
+
 const cors = require("cors");
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
@@ -155,9 +156,19 @@ app.post("/upload", photosMiddleware.array("photos", 100), (req, res) => {
 });
 
 // --- Add New Accommodations ---
-app.post("/addAccomodations", (req, res) => {
+app.post("/places", (req, res) => {
   const { token } = req.cookies;
-  const {owner, title, address, photos, description, perks, extraInfo, checkIn, checkOut, maxGuests} = req.body; 
+  const {
+    title,
+    address,
+    photos,
+    description,
+    perks,
+    extraInfo,
+    checkIn,
+    checkOut,
+    maxGuests,
+  } = req.body;
   jwt.verify(token, jwtSecret, {}, async (err, userData) => {
     if (err) throw err;
     const Placedoc = await Place.create({
@@ -170,9 +181,64 @@ app.post("/addAccomodations", (req, res) => {
       extraInfo,
       checkIn,
       checkOut,
-      maxGuests
+      maxGuests,
     });
     res.json(Placedoc);
+  });
+});
+
+// --- Get List of User's Accommodations ---
+
+app.get("/places", (req, res) => {
+  //Grabbing user id
+  const { token } = req.cookies;
+  jwt.verify(token, jwtSecret, {}, async (err, userData) => {
+    if (err) throw err;
+    const { id } = userData;
+    res.json(await Place.find({ owner: id }));
+  });
+});
+
+//Get details of a specific place by id
+app.get("/places/:id", async (req, res) => {
+  const { id } = req.params;
+  res.json(await Place.findById(id));
+});
+
+// --- Update Existing Accommodation ---
+app.put("/places", async (req, res) => {
+  const { token } = req.cookies;
+  const {
+    id,
+    title,
+    address,
+    photos: photos,
+    description,
+    perks,
+    extraInfo,
+    checkIn,
+    checkOut,
+    maxGuests,
+  } = req.body;
+  
+  jwt.verify(token, jwtSecret, {}, async (err, userData) => {
+    if (err) throw err;
+    const placeDoc = await Place.findById(id);
+    if (userData.id === placeDoc.owner.toString()) {
+      placeDoc.set({
+        title,
+        address,
+        photos: photos,
+        description,
+        perks,
+        extraInfo,
+        checkIn,
+        checkOut,
+        maxGuests,
+      });
+      await placeDoc.save();
+      res.json("ok");
+    }
   });
 });
 
