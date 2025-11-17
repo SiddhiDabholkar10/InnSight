@@ -1,28 +1,33 @@
 const express = require("express");
-
 const cors = require("cors");
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const {S3Client, PutObjectCommand} = require('@aws-sdk/client-s3');
 const User = require("./models/User.js");
 const Place = require("./models/Place.js");
 const cookieParser = require("cookie-parser");
 const imageDownloader = require("image-downloader");
-require("dotenv").config();
-const app = express();
+const mime = require('mime-types');
 const path = require("path");
 const fs = require("fs");
 const multer = require("multer");
 const uploadsDir = path.join(__dirname, "uploads");
 
-fs.mkdirSync(uploadsDir, { recursive: true });
-app.use("/uploads", express.static(uploadsDir));
-const mime = require('mime-types');
-//const {S3Client, PutObjectCommand} = require('@aws-sdk/client-s3');
+
+
+require("dotenv").config();
+const app = express();
+
+app.use('/uploads', express.static(__dirname+'/uploads')); //no need to serve uploads locally now
+
+
+
 
 const bcryptSalt = bcrypt.genSaltSync(10);
 
 const jwtSecret = process.env.jwtSECRET;
+const bucket = 'innsight-app-bucket';
 
 //parses json body and put it in req.body
 app.use(express.json());
@@ -36,6 +41,27 @@ app.use(
     origin: "http://localhost:5173",
   })
 );
+
+async function uploadToS3(path, originalFilename, mimetype) {
+  const client = new S3Client({
+    region: 'us-east-1',
+    credentials: {
+      accessKeyId: process.env.S3_ACCESS_KEY,
+      secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
+    },
+  });
+  const parts = originalFilename.split('.');
+  const ext = parts[parts.length - 1];
+  const newFilename = Date.now() + '.' + ext;
+  await client.send(new PutObjectCommand({
+    Bucket: bucket,
+    Body: fs.readFileSync(path),
+    Key: newFilename,
+    ContentType: mimetype,
+    ACL: 'public-read',
+  }));
+  return `https://${bucket}.s3.amazonaws.com/${newFilename}`;
+}
 
 // --- Database connection ---
 mongoose.connect(process.env.MONGO_URL);
@@ -118,24 +144,25 @@ app.post('/upload-by-link', async (req,res) => {
   const newName = 'photo' + Date.now() + '.jpg';
   await imageDownloader.image({
     url: link, 
-    dest: __dirname + '/uploads/' + newName,
+    dest: '/photostmp/' +newName,
   });
-  res.json(newName);
+  const url = await uploadToS3('/photostmp/' +newName, newName, mime.lookup('/photostmp/' +newName));
+ 
+  res.json(url);
 });
 
 
 // --- Upload Photos from device ---
-const photosMiddleware = multer({ dest: "uploads/" });
+const photosMiddleware = multer({dest:'/photostmp'});
 
-app.post("/upload", photosMiddleware.array("photos", 100), (req, res) => {
+app.post("/upload", photosMiddleware.array("photos", 100),async (req, res) => {
   const uploadedFiles = [];
   for (let i = 0; i < req.files.length; i++) {
-    const { path, originalname } = req.files[i];
-    const parts = originalname.split(".");
-    const ext = parts[parts.length - 1];
-    const newPath = path + "." + ext;
-    fs.renameSync(path, newPath);
-    uploadedFiles.push(newPath.replace("uploads\\", "/")); // Store only the filename, not the full path
+    const { path, originalname,mimetype } = req.files[i];
+    const url = await uploadToS3(path, originalname, mimetype);
+    uploadedFiles.push(url);
+   
+    
   }
   res.json(uploadedFiles);
 });
@@ -147,6 +174,7 @@ app.post("/places", (req, res) => {
     title,
     address,
     photos,
+    addedPhotos,
     description,
     perks,
     extraInfo,
@@ -154,13 +182,14 @@ app.post("/places", (req, res) => {
     checkOut,
     maxGuests,
   } = req.body;
+  const photosArray = photos || addedPhotos || []; 
   jwt.verify(token, jwtSecret, {}, async (err, userData) => {
     if (err) throw err;
     const Placedoc = await Place.create({
       owner: userData.id,
       title,
       address,
-      photos,
+      photos: photosArray,
       description,
       perks,
       extraInfo,
@@ -197,7 +226,8 @@ app.put("/places", async (req, res) => {
     id,
     title,
     address,
-    photos: photos,
+    photos,
+    addedPhotos,
     description,
     perks,
     extraInfo,
@@ -205,7 +235,7 @@ app.put("/places", async (req, res) => {
     checkOut,
     maxGuests,
   } = req.body;
-  
+  const photosArray = photos || addedPhotos || []; 
   jwt.verify(token, jwtSecret, {}, async (err, userData) => {
     if (err) throw err;
     const placeDoc = await Place.findById(id);
@@ -213,7 +243,7 @@ app.put("/places", async (req, res) => {
       placeDoc.set({
         title,
         address,
-        photos: photos,
+        photos: photosArray,
         description,
         perks,
         extraInfo,
