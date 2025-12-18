@@ -203,7 +203,7 @@ app.post("/places", (req, res) => {
 
 // --- Get List of User's Accommodations ---
 
-app.get("/places", (req, res) => {
+app.get("/user-places", (req, res) => {
   //Grabbing user id
   const { token } = req.cookies;
   jwt.verify(token, jwtSecret, {}, async (err, userData) => {
@@ -211,6 +211,11 @@ app.get("/places", (req, res) => {
     const { id } = userData;
     res.json(await Place.find({ owner: id }));
   });
+});
+
+
+app.get("/places", async (req, res) => {
+  res.json(await Place.find());
 });
 
 //Get details of a specific place by id
