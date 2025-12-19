@@ -19,6 +19,7 @@ export default function AddAccomodationPlaceForm() {
   const [checkIn, setCheckIn] = useState("");
   const [checkOut, setCheckOut] = useState("");
   const [maxGuests, setMaxGuests] = useState(1);
+  const [price, setPrice] = useState(100);
   const [redirect, setRedirect] = useState(false);
   useEffect(() => {
     if (!id) {
@@ -35,6 +36,7 @@ export default function AddAccomodationPlaceForm() {
       setCheckIn(data.checkIn);
       setCheckOut(data.checkOut);
       setMaxGuests(data.maxGuests);
+      setPrice(data.price);
     });
   }, [id]);
 
@@ -68,6 +70,7 @@ export default function AddAccomodationPlaceForm() {
       checkIn,
       checkOut,
       maxGuests,
+      price
     };
     if (id) {
       //this id already exist so all we need to do is update the info on it
@@ -134,7 +137,7 @@ export default function AddAccomodationPlaceForm() {
             onChange={(ev) => setExtraInfo(ev.target.value)}
           />
           <h2 className="text-xl mt-4">Check in & out times</h2>
-          <div className="grid sm:grid-cols-3 gap-2">
+          <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-2">
             <div>
               <h3 className="mt-2 -mb-1">Check in time</h3>
               <input
@@ -160,6 +163,15 @@ export default function AddAccomodationPlaceForm() {
                 placeholder="2"
                 value={maxGuests}
                 onChange={(ev) => setMaxGuests(ev.target.value)}
+              />
+            </div>
+            <div>
+              <h3 className="mt-2 -mb-1">Price per person per night</h3>
+              <input
+                type="number"
+                placeholder="2"
+                value={price}
+                onChange={(ev) => setPrice(ev.target.value)}
               />
             </div>
           </div>

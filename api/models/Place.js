@@ -13,6 +13,7 @@ const placeSchema = new Schema({
     checkIn : [{type: Number}],
     checkOut : [{type: Number}], // Check-out time (optional, can be null)
     maxGuests : {type: Number, required: true}, // Maximum number of guests allowed (required)
+    price: [{type: Number}] // Price per night (required)
 
 });
 

@@ -181,6 +181,7 @@ app.post("/places", (req, res) => {
     checkIn,
     checkOut,
     maxGuests,
+    price,
   } = req.body;
   const photosArray = photos || addedPhotos || []; 
   jwt.verify(token, jwtSecret, {}, async (err, userData) => {
@@ -196,6 +197,7 @@ app.post("/places", (req, res) => {
       checkIn,
       checkOut,
       maxGuests,
+      price,
     });
     res.json(Placedoc);
   });
@@ -239,6 +241,7 @@ app.put("/places", async (req, res) => {
     checkIn,
     checkOut,
     maxGuests,
+    price,
   } = req.body;
   const photosArray = photos || addedPhotos || []; 
   jwt.verify(token, jwtSecret, {}, async (err, userData) => {
@@ -255,6 +258,7 @@ app.put("/places", async (req, res) => {
         checkIn,
         checkOut,
         maxGuests,
+        price,
       });
       await placeDoc.save();
       res.json("ok");
