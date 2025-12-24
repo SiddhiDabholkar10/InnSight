@@ -33,6 +33,7 @@ export default function PlacesPage() {
           Manage all your accomodation places.
           <br />
           <Link
+            
             to="/account/places/new"
             className="inline-flex py-2 px-6 gap-1 border border-primary rounded-full hover:bg-primary hover:transition"
           >
