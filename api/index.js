@@ -6,6 +6,7 @@ const jwt = require("jsonwebtoken");
 const {S3Client, PutObjectCommand} = require('@aws-sdk/client-s3');
 const User = require("./models/User.js");
 const Place = require("./models/Place.js");
+const Booking = require("./models/Booking.js");
 const cookieParser = require("cookie-parser");
 const imageDownloader = require("image-downloader");
 const mime = require('mime-types');
@@ -263,6 +264,38 @@ app.put("/places", async (req, res) => {
       await placeDoc.save();
       res.json("ok");
     }
+  });
+});
+
+function getUserDataFromReq(req) {
+  return new Promise((resolve, reject) => {
+    jwt.verify(req.cookies.token, jwtSecret, {}, async (err, userData) => {
+      if (err) throw err;
+      resolve(userData);
+    });
+  });
+}
+
+app.get('/bookings', async (req,res) => {
+  mongoose.connect(process.env.MONGO_URL);
+  const userData = await getUserDataFromReq(req);
+  res.json( await Booking.find({user:userData.id}).populate('place') );
+});
+
+// --- Booking Functionality ---
+app.post('/bookings', async (req, res) => {
+ 
+  const userData = await getUserDataFromReq(req);
+  const {
+    place,checkIn,checkOut,numberOfGuests,name,phone,price,
+  } = req.body;
+  Booking.create({
+    place,checkIn,checkOut,numberOfGuests,name,phone,price,
+    user:userData.id,
+  }).then((doc) => {
+    res.json(doc);
+  }).catch((err) => {
+    throw err;
   });
 });
 

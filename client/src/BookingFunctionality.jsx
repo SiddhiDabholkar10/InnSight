@@ -23,7 +23,7 @@ export default function BookingFunctionality({ place }) {
   }
 
   async function bookThisPlace() {
-    const response = await axios.post("/bookings", {
+    const response = await axios.post('/bookings', {
       checkIn,
       checkOut,
       numberOfGuests,
