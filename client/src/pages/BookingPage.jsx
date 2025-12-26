@@ -48,22 +48,83 @@ export default function BookingPage() {
     return <div className="my-8">Booking not found (maybe not owned by this user).</div>;
   }
 
-  return (
-    <div className="my-8">
-      <h1 className="text-3xl">{booking.place.title}</h1>
-      <AddressLink className="my-2 block">{booking.place.address}</AddressLink>
+ return (
+  <div className="bg-gray-50">
+    <div className="mx-auto max-w-6xl px-4 md:px-6 py-10">
+      {/* Header */}
+      <div className="flex flex-col gap-2">
+        <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-gray-900">
+          {booking.place.title}
+        </h1>
 
-      <div className="bg-gray-200 p-6 my-6 rounded-2xl flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl mb-4">Your booking information:</h2>
-          <BookingDatesFormat booking={booking} />
-        </div>
+        <AddressLink className="text-sm text-gray-600 underline underline-offset-4 hover:text-gray-900">
+          {booking.place.address}
+        </AddressLink>
+      </div>
 
-        <div className="bg-primary p-6 text-white rounded-2xl">
-          <div>Total price</div>
-          <div className="text-3xl">${booking.price}</div>
+      {/* Main card */}
+      <div className="mt-8 rounded-3xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+        <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr]">
+          {/* Left: details */}
+          <div className="p-6 md:p-8">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg md:text-xl font-semibold text-gray-900">
+                Your booking information
+              </h2>
+              <span className="text-xs font-medium rounded-full bg-gray-100 px-3 py-1 text-gray-700">
+                Confirmed
+              </span>
+            </div>
+
+            <div className="mt-5 rounded-2xl border border-gray-200 bg-gray-50 p-5">
+              <BookingDatesFormat booking={booking} />
+            </div>
+
+            <div className="mt-6 text-sm text-gray-600">
+              Need changes? Contact support from your account page.
+            </div>
+          </div>
+
+          {/* Right: price */}
+          <div className="border-t lg:border-t-0 lg:border-l border-gray-200 p-6 md:p-8 bg-white">
+            <div className="rounded-3xl bg-primary text-blak p-6 shadow-sm">
+              <div className="text-sm text-black/80">Total price</div>
+              <div className="mt-2 text-3xl font-bold">${booking.price}</div>
+
+              <div className="mt-5 h-px bg-white/10" />
+
+              <div className="mt-4 space-y-2 text-sm text-black/85">
+                <div className="flex items-center justify-between">
+                  <span>Guests</span>
+                  <span className="font-semibold text-black">
+                    {booking.numberOfGuests}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span>Name</span>
+                  <span className="font-semibold text-black">
+                    {booking.name || "—"}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span>Phone</span>
+                  <span className="font-semibold text-black">
+                    {booking.phone || "—"}
+                  </span>
+                </div>
+              </div>
+
+              
+            </div>
+
+            <p className="mt-4 text-xs text-gray-500">
+              Prices include applicable fees (if any).
+            </p>
+          </div>
         </div>
       </div>
     </div>
-  );
+  </div>
+);
+
 }
