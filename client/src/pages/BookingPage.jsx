@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import AddressLink from "../AddressLink";
 import BookingDatesFormat from "../BookingDatesFormat.jsx";
+import PlacesImageAlbum from "../PlacesImageAlbum.jsx";
 
 export default function BookingPage() {
   const params = useParams();
@@ -49,7 +50,7 @@ export default function BookingPage() {
   }
 
  return (
-  <div className="bg-gray-50">
+  <div className="bg-gray-50 min-h-screen">
     <div className="mx-auto max-w-6xl px-4 md:px-6 py-10">
       {/* Header */}
       <div className="flex flex-col gap-2">
@@ -65,13 +66,13 @@ export default function BookingPage() {
       {/* Main card */}
       <div className="mt-8 rounded-3xl border border-gray-200 bg-white shadow-sm overflow-hidden">
         <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr]">
-          {/* Left: details */}
+          {/* Left */}
           <div className="p-6 md:p-8">
             <div className="flex items-center justify-between">
               <h2 className="text-lg md:text-xl font-semibold text-gray-900">
                 Your booking information
               </h2>
-              <span className="text-xs font-medium rounded-full bg-gray-100 px-3 py-1 text-gray-700">
+              <span className="text-xs font-medium rounded-full bg-emerald-50 px-3 py-1 text-emerald-700 border border-emerald-100">
                 Confirmed
               </span>
             </div>
@@ -85,10 +86,10 @@ export default function BookingPage() {
             </div>
           </div>
 
-          {/* Right: price */}
+          {/* Right */}
           <div className="border-t lg:border-t-0 lg:border-l border-gray-200 p-6 md:p-8 bg-white">
-            <div className="rounded-3xl bg-primary text-blak p-6 shadow-sm">
-              <div className="text-sm text-black/80">Total price</div>
+            <div className="rounded-3xl bg-primary text-black p-6 shadow-sm">
+              <div className="text-sm text-black/70">Total price</div>
               <div className="mt-2 text-3xl font-bold">${booking.price}</div>
 
               <div className="mt-5 h-px bg-white/10" />
@@ -113,8 +114,6 @@ export default function BookingPage() {
                   </span>
                 </div>
               </div>
-
-              
             </div>
 
             <p className="mt-4 text-xs text-gray-500">
@@ -122,7 +121,13 @@ export default function BookingPage() {
             </p>
           </div>
         </div>
+        <div className="mt-0">
+        <PlacesImageAlbum place={booking.place} />
       </div>
+      </div>
+
+      {/* Album (keep aligned with page width) */}
+      
     </div>
   </div>
 );
