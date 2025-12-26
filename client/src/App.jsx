@@ -30,6 +30,8 @@ function App() {
       <Route path="/place/:place_id" element={<PlacePage/>}/>
       <Route path="/account/bookings" element={<BookingsPage/>}/>
       <Route path="/account/bookings/:booking_id" element={<BookingPage/>}/>
+      <Route path="*" element={<div className="p-6">NOT FOUND</div>} />
+
 
 
 
